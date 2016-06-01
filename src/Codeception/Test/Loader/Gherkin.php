@@ -16,19 +16,6 @@ use Codeception\Util\Annotation;
 
 class Gherkin implements LoaderInterface
 {
-    protected static $defaultKeywords = [
-        'feature'          => 'Feature',
-        'background'       => 'Background',
-        'scenario'         => 'Scenario',
-        'scenario_outline' => 'Scenario Outline|Scenario Template',
-        'examples'         => 'Examples|Scenarios',
-        'given'            => 'Given',
-        'when'             => 'When',
-        'then'             => 'Then',
-        'and'              => 'And',
-        'but'              => 'But'
-    ];
-
     protected static $defaultSettings = [
         'namespace' => '',
         'class_name' => '',
@@ -37,8 +24,23 @@ class Gherkin implements LoaderInterface
                 'default' => [],
                 'tag' => [],
                 'role' => []
-            ]
-        ]
+            ],
+            'language' => 'en',
+            'keywords' => [
+                'en' => [
+                    'feature'          => 'Feature',
+                    'background'       => 'Background',
+                    'scenario'         => 'Scenario',
+                    'scenario_outline' => 'Scenario Outline|Scenario Template',
+                    'examples'         => 'Examples|Scenarios',
+                    'given'            => 'Given',
+                    'when'             => 'When',
+                    'then'             => 'Then',
+                    'and'              => 'And',
+                    'but'              => 'But',
+                ],
+            ],
+        ],
     ];
 
     protected $tests = [];
@@ -58,7 +60,8 @@ class Gherkin implements LoaderInterface
         if (!class_exists('Behat\Gherkin\Keywords\ArrayKeywords')) {
             throw new TestParseException('Feature file can only be parsed with Behat\Gherkin library. Please install `behat/gherkin` with Composer');
         }
-        $keywords = new GherkinKeywords(['en' => static::$defaultKeywords]);
+        $keywords = new GherkinKeywords($this->settings['gherkin']['keywords']);
+        $keywords->setLanguage($this->settings['gherkin']['language']);
         $lexer = new GherkinLexer($keywords);
         $this->parser = new GherkinParser($lexer);
         $this->fetchGherkinSteps();
